@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META name="GENERATOR" content="IBM WebSphere Studio">
+<META http-equiv="Content-Style-Type" content="text/css">
+
+<TITLE>Readme</TITLE>
+</HEAD>
+<BODY>
+<P><BR>
+</P>
+<H1>Java Certificate Services</H1>
+
+<HR>
+<P><BR>
+</P>
+<H2>1. Introduction</H2>
+<P>The Java Certificate Services provides an implementation of the simple<BR>
+ca services in java. It contains some of the functionality of the<BR>
+openssl program. It also includes a handly web application that can<BR>
+be access from anybody in your intranet to request certificates <BR>
+and sign them<BR>
+<BR>
+</P>
+<H2>2. Installation</H2>
+<P><B>2.1 Requirements</B><BR>
+<BR>
+<B>2.2.1 Java</B><BR>
+<BR>
+The Java Certificate Services requires J2SE version 1.3.1 or higher.<BR>
+It is assumed that Java is properly installed and that the Java bin/
+directory <BR>
+has been included in the user's path.<BR>
+<BR>
+<BR>
+<B>2.2.3 JCS_ROOT variable</B><BR>
+<BR>
+The JCS_ROOT environment variable must be set<BR>
+before any of the scripts included with the Java Certificate Services<BR>
+will work. This variable points to where the Java Certificate Services <BR>
+is installed. (For example: C:\jCertServices-1.1)<BR>
+<BR>
+</P>
+<b>2.2.4 Webtool Tomcat Deployment</b>
+<P>The webtool provides the same functionality as the command line one. To deploy it in tomcat 4.1.2.27 use the following command from the JCS_INTALL_PATH folder:</P><OL>
+	<LI class="MsoNormal">Type ant -Dtomcat.dir=&lt;tomcat root&gt;
+	deployTomcat</LI>
+	<LI class="MsoNormal">Replace tomcat.dir with your tomcat root install folder</LI>
+</OL>
+<P><B>2.3 Configuration</B><BR>
+<BR>
+<B>2.3.1 Prerequisites</B><BR>
+<BR>
+This software uses modified versions of the Bouncy Castle provider<BR>
+and Criptix 3.2. This code has been modiefied to work under an <BR>
+application such as WebSphere. This code has been fully tested<BR>
+with Websphere AppServer 4.x/5.x.<BR>
+Changes to the JCE providers allow to bypass imcompatibilities<BR>
+of multiple JCE providers runing on an application server.<BR>
+<BR>
+<B> 2.3.2 Setup</B><BR>
+Unzip the binary distribution on your hard disk and create<BR>
+the environment variable JCS_ROOT to point to the install<BR>
+folder<BR>
+<BR>
+<B>2.4. Samples</B><BR>
+<BR>
+USAGE: jcs [service] [options]<BR>
+Service values are: <BR>
+req - to create a cert request<BR>
+ca - to sign a request<BR>
+<BR>
+req (Certificate Request) options are:<BR>
+<BR>
+-out (Required) [path to the request PEM]<BR>
+-keyout (Required) [path to the private key PEM]<BR>
+-pwd (Required) [passphraseused to encrypt the key]<BR>
+-dn (Optional) [Certificate identity. e.g: C=US,O=Grid,OU=OGSA,CN=John
+Doe]<BR>
+-debug (Optional) [display debug msgs]<BR>
+<BR>
+ca (Certificate signature) options are:<BR>
+<BR>
+-rq (Required) [path to the request PEM file to be signed]<BR>
+-out (Required) [path to the signed certificate e.g
+$HOME/.globus/usercert.ppem]<BR>
+-cacert (optional) [path to the CA certificate PEM]<BR>
+-cakey (optional) [path to the CA private key PEM file]<BR>
+-capwd (optional) [CA passphrase]<BR>
+<BR>
+</P>
+<H3><B>Samples</B></H3>
+
+<B>Creating a Certificate Request: </B>
+<P><I>jcs -keyout $HOME/.globus/userkey.pem -out
+$HOME/.gobus/user-rq.pem -pwd test -debug </I><BR><BR>
+<B>Certificate
+signature: </B></P>
+
+
+<P><I>jcs ca  -rq c:\\temp\\rq.pem -out c:\\temp\\cert.pem  -capwd globus -debug</I></P>
+<H2>3. Features</H2>
+<P><B>What's new in version 1.1?</B><BR>
+<BR>
+o Command line tool to create cert requests and private keys<BR>
+o Command line tool to sign certificate request<BR>
+o Web Application tool for the above functionality<BR>
+o Creation of CA(self-signed) certificates<BR>
+<BR>
+</P>
+<B>Using the Web tool</B>
+<P>o Under construction<BR>
+<BR>
+</P>
+<B>4.2 Bugs, suggestions, contributions</B>
+<P>No support is provided for this software. Feel free to modify it<BR>
+at your leisure.<BR>
+<BR>
+</P>
+<B>4.3 Contacts</B>
+<P>Vladimir Silva Developer vsilva@us.ibm.com<BR>
+Jarek Gawor Developer gawor@mcs.anl.gov<BR>
+Gregor von Laszewski Supervisor/Developer gregor@mcs.anl.gov<BR>
+<BR>
+</P>
+<H2>5. Globus website</H2>
+
+
+
+<P><I>http://www.globus.org/</I></P>
+</BODY>
+</HTML>

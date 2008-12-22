@@ -1,0 +1,39 @@
+@echo off
+
+if "X%JCS_ROOT%" == "X" goto nocogpath
+goto cogpath
+
+:nocogpath
+
+    echo Error: JCS_ROOT not set
+    goto end
+
+:cogpath
+
+set COG_CMD_LINE_ARGS=
+
+:setupArgs
+if %1a==a goto doneStart
+set COG_CMD_LINE_ARGS=%COG_CMD_LINE_ARGS% %1
+shift
+goto setupArgs
+
+:doneStart
+
+call "%JCS_ROOT%\etc\java.cfg.bat"
+
+set LOCAL_OPTS=
+
+if "X%GLOBUS_LOCATION%" == "X" goto option1
+set LOCAL_OPTS=-DGLOBUS_LOCATION=%GLOBUS_LOCATION%
+
+:option1
+if "X%X509_USER_PROXY%" == "X" goto run
+set LOCAL_OPTS=-DX509_USER_PROXY=%X509_USER_PROXY% %LOCAL_OPTS%
+
+:run
+set LDAP_JARS=-Xbootclasspath/p:%JCS_ROOT%\lib\providerutil.jar;%JCS_ROOT%\lib\ldap.jar
+
+java %LOCAL_OPTS% %COG_OPTS% %LDAP_JARS% -classpath "%LOCALCLASSPATH%" @class@ %COG_CMD_LINE_ARGS%
+
+:end
