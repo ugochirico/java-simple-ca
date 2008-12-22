@@ -1,0 +1,25 @@
+BODY
+{
+    BACKGROUND-COLOR: #FFFFFF;
+    FONT-FAMILY: 'Verdana, Arial, Helvetica';
+	font-size: 12px;               
+}
+H1
+{
+    FONT-FAMILY: 'Verdana, Arial, Helvetica';
+}
+H2
+{
+    FONT-FAMILY: 'Verdana, Arial, Helvetica';
+    TEXT-TRANSFORM: capitalize
+}
+H3
+{
+    FONT-FAMILY: 'Verdana, Arial, Helvetica';
+    TEXT-TRANSFORM: capitalize
+}
+
+TABLE {
+    FONT-FAMILY: 'Verdana, Arial, Helvetica';
+	font-size: 12px;               
+}

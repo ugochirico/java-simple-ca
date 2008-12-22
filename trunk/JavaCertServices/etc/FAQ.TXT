@@ -1,0 +1,41 @@
+Java Certificate Services Toolkit FAQ 
+====================
+
+0. What License does Java Certificate Services have?
+
+   The Java Certificate Services Kit is licensed under the Globus Toolkit Public License 
+   (http://www.globus.org/toolkit/download/license.html)
+
+   If you would like to use CoG and any software that is built on top of CoG,
+   we request that you notify us so we can keep track of the
+   usefulness of CoG. This directly affects our funding. Please, be so
+   kind to send an e-mail to gregor@mcs.anl.gov with the following
+   description:
+   
+	Project Name:
+	Institution:
+	Main Contact Person:
+	E-mail:
+	Web Page:
+	Description of your project:
+
+   Furthermore, if your project uses Java Certificate Services Kit, or you use a
+   software package that uses Java Certificate Services Kit, we request that you cite
+   the following paper in your publications:
+
+	 A Java Commodity Grid Kit, Gregor von Laszewski, 
+	 Ian Foster, Jarek Gawor, Peter Lane, 
+	 Concurrency and Computation: Practice and Experience, 
+	 pages 643-662, Volume 13, Issue 8-9, 2001. 
+	 http://www.globus.org/cog/java/
+
+   We also would like to be notified about publications that you write
+   while using CoG, as this will help us to document the usefulness of
+   CoG.
+ 
+   If you have difficulties with these requirements please contact us.
+
+I. Setup
+
+  1. How do I setup the Java Certificate Services Kit?
+

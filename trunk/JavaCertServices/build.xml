@@ -1,0 +1,367 @@
+<project name="Java Certificate Services" default="compile" basedir=".">
+
+  <property file="build.properties"/>
+
+  <property name="project"        value="Java Certificate Services"/>
+
+  <property name="simpleca.src.dir"        value="JavaSource"/>
+  <property name="simpleca.dst.dir"        value="${build.dir}/classes"/>
+
+  <property name="simpleca.doc.dir"       value="${dist.dir}/doc"/>
+  <property name="simpleca.javadoc.dir"    value="${simpleca.doc.dir}/api"/>
+
+  <property name="simpleca.jar.filename"     value="jcert-services.jar"/>
+  <property name="simpleca.jar.file"        
+            value="${build.dir}/${simpleca.jar.filename}"/>
+
+  <property name="simpleca.jar.lib.file"   value="${build.dir}/simpleca-lib.jar"/>
+
+  <property name="javadoc.files" value="
+					org.globus.grid.ca.*,
+					org.globus.grid.cert.*,
+					org.globus.grid.gsi.*,
+  "/>
+
+
+  <property name="jars" value = "${simpleca.jar.file},${simpleca.jar.lib.file}"/>
+
+  <property name="exclude.dirs" value="" />
+
+
+
+  <path id="classpath">
+    <fileset dir="WebContent/WEB-INF/lib">
+     <include name="*.jar"/>
+     <include name="*.zip"/>
+    </fileset>
+  </path>
+
+  <!-- =================================================================== -->
+  <!-- Help                                                                -->
+  <!-- =================================================================== -->
+  
+  <target name="help">
+     <echo>
+The following targets can be executed:
+	all       - builds and installs the Simple CA components
+	prepare   - creates the build and install directories
+	build location:   ${build.dir}
+	compile   - compiles the Java CoG Kit in org.globus 
+	clean     - removes the class files of the Java CoG Kit in org.globus
+	cleanAll  - removes the entire build/ directory 
+	help      - prints out this help message
+     </echo>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Tomcat deployment                                                   -->
+  <!-- =================================================================== -->
+
+  <target name="deployTomcat">
+    <ant antfile="${deploy.tomcat}" target="deployTomcat"/>
+  </target>
+
+  <target name="redeployTomcat">
+    <ant antfile="${deploy.tomcat}" target="redeployTomcat"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- target: all                                                         -->
+  <!-- =================================================================== -->
+
+  <target name="all" depends="prepare,compile,alljars,doc,dist,webapp">
+      <echo>
+	     Building and installing all of the Simple CA components...
+      </echo>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Functions                                                           -->
+  <!-- =================================================================== -->
+  
+  <target name="prepare">
+	<mkdir dir="${build.dir}"/>
+        <mkdir dir="${simpleca.dst.dir}"/>
+  </target>
+
+  <target name="setenv">
+    <echo message=""/>
+    <echo message="--- Property values ---" />
+    <echo message="debug=${debug}" />
+    <echo message="deprecation=${deprecation}" />
+    <echo message="optimize=${optimize}" />
+
+  </target>
+
+  <target name="compile" depends="compileCore,compileDBMS"/>
+
+  <target name="compileCore" depends="prepare,setenv">
+	<javac  srcdir="${simpleca.src.dir}" 
+		destdir="${simpleca.dst.dir}"
+ 		includes="org/**/*.java"
+		excludes="${exclude.dirs}"
+		classpathref="classpath"
+        	debug="${debug}" 
+		optimize="${optimize}"
+		deprecation="${deprecation}">
+	</javac>
+	<copy todir="${simpleca.dst.dir}" >
+                <fileset dir="${simpleca.src.dir}" includes="**/*.properties" />
+                <fileset dir="etc" includes="log4j.properties" />
+    </copy>
+  </target>  
+
+  <target name="compileDBMS" depends="prepare,setenv">
+	<javac  srcdir="${simpleca.src.dir}" 
+		destdir="${simpleca.dst.dir}"
+ 		includes="dbms/**/*.java"
+		excludes="${exclude.dirs}"
+		classpathref="classpath"
+        debug="${debug}" 
+		optimize="${optimize}"
+		deprecation="${deprecation}">
+	</javac>
+  </target>  
+
+
+  <target name="clean">
+     <delete dir="${simpleca.dst.dir}" />
+     <delete dir="${reports.tests}" />
+     <delete>
+       <fileset dir="." includes="${jars}" />
+     </delete>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- cleanAll -->
+  <!-- =================================================================== -->
+
+  <target name="cleanAll" depends="clean">
+        <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Jar: all, lib, tools                                                -->
+  <!-- =================================================================== -->
+
+  <target name="alljars" depends="jar,coreJar" >
+	  <echo>
+	        Building all jar files...
+          </echo>
+  </target>
+
+  <target name="jar" depends="coreJar"/>
+
+  <target name="coreJar" depends="prepare,compile" >
+	<jar jarfile="${simpleca.jar.file}"
+		basedir="${simpleca.dst.dir}"
+		includes="org/globus/**, dbms/**, *.properties"
+	    excludes="junit/**"
+	/>
+  </target>
+  <!-- 	manifest="etc/${manifest}" -->
+  
+
+  <!-- =================================================================== -->
+  <!-- Runs all JUnit tests: needs optional.jar and junit in classpath     -->
+  <!-- =================================================================== -->
+
+  <target name="test" depends="compile">
+	<mkdir dir = "${reports.tests}" />
+	<junit printsummary="yes" haltonfailure="yes" timeout="600000">
+		<classpath>
+		    <path refid="classpath"/>
+			<pathelement path="${simpleca.dst.dir}" />
+			<pathelement path="${java.class.path}" />
+			<pathelement path="WebContent/WEB-INF/lib/junit.jar" />
+		</classpath>
+
+		<formatter type="plain" />
+
+		<batchtest fork="yes" todir="${reports.tests}">
+			<fileset dir="${simpleca.src.dir}">
+				<include name="junit/tests/**/*.java" />
+			</fileset>
+		</batchtest>
+	</junit>
+  </target>
+
+ <target name="testAll" depends="compile">
+        <mkdir dir = "${reports.tests}" />
+        <junit printsummary="yes" haltonfailure="no" timeout="600000">
+                <classpath>
+                        <path refid="classpath"/>
+                        <pathelement path="${simpleca.dst.dir}" />
+                        <pathelement path="${java.class.path}" />
+                </classpath>
+
+                <formatter type="xml" />
+
+                <batchtest fork="yes" todir="${reports.tests}">
+                        <fileset dir="${simpleca.src.dir}">
+                           <include name="junit/tests/**/*.java" />
+                           <!--
+                           <exclude name="org/globus/replica/catalog/**" />
+                           -->
+                        </fileset>
+                </batchtest>
+
+                <jvmarg value="-D${testjvmarg}"/> 
+        </junit>
+  </target>
+
+  <target name="generateTestReport"  depends="testAll" >
+   <mkdir dir = "${html.reports}" />
+   <junitreport todir="${reports.tests}">
+     <fileset dir="${reports.tests}">
+       <include name="TEST-*.xml"/>
+     </fileset>
+     <report format="frames" todir="${html.reports}"/>
+   </junitreport>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- JavaDoc                                                             -->
+  <!-- =================================================================== -->
+  
+  <target name="doc" depends="javadoc"/>
+
+  <target name="javadoc">
+	<mkdir dir="${simpleca.javadoc.dir}"/>
+        <javadoc packagenames="${javadoc.files}"
+		 classpathref="classpath"
+		 sourcepath="${simpleca.src.dir}"
+		 destdir="${simpleca.javadoc.dir}"
+		 private="false"
+		 doctitle="Simple CA (v${version})"
+		 windowtitle="${project} API"
+		 excludepackagenames="org.globus.blank"
+		 use="true">
+         <link href="http://java.sun.com/products/jdk/1.3/docs/api/"/>
+         <link href="http://www.bouncycastle.org/docs/"/>
+         <link href="http://java.sun.com/j2se/1.4.1/docs/api/"/>
+	</javadoc>
+  </target>
+
+
+  <!-- =================================================================== -->
+  <!-- Binary distribution                                                 -->
+  <!-- =================================================================== -->
+
+  <target name="launcher">
+    <echo message="Creating launcher for ${launcher-name}"/>
+    <filter token="class" value="${class-name}"/>
+    <copy file="etc/unix/launcher-template" 
+        tofile="${dist.dir}/bin/${launcher-name}" filtering="true"/>
+    <fixcrlf srcdir="${dist.dir}/bin/" eol="lf" includes="${launcher-name}"/>
+    <chmod file="${dist.dir}/bin/${launcher-name}" perm="+x"/>
+    <copy file="etc/windows/launcher-template" 
+          tofile="${dist.dir}/bin/${launcher-name}.bat" filtering="true"/>
+    <fixcrlf srcdir="${dist.dir}/bin/" includes="${launcher-name}.bat" eol="crlf" />
+  </target>
+
+  <target name="dist" depends="jar" >
+	<mkdir dir="${dist.dir}"/>
+	<mkdir dir="${dist.dir}/bin"/>
+	<mkdir dir="${dist.dir}/lib"/>
+	<mkdir dir="${dist.dir}/etc"/>
+	<mkdir dir="${dist.dir}/simple-test"/>
+
+	<copy todir="${dist.dir}/lib" >
+		<fileset dir="WebContent/WEB-INF/lib">
+                   <!-- <exclude name="jaas.jar"/> -->
+		</fileset>
+	</copy>
+
+	<copy todir="${dist.dir}" >
+                <fileset dir="etc" includes="*.html" />
+	</copy>
+
+    <copy todir="${dist.dir}/lib" >
+		<fileset dir="${build.dir}" includes="*.jar" />
+    </copy>
+
+	<copy file="etc/README.TXT" todir="${dist.dir}" />
+	<copy file="etc/readme.html" todir="${dist.dir}" />
+	<copy file="etc/FAQ.TXT" todir="${dist.dir}" />
+	<copy file="etc/LICENSE.TXT" todir="${dist.dir}" />
+
+	<copy file="etc/log4j.properties" todir="${dist.dir}/etc" />
+	<copy file="etc/windows/java.cfg.bat" todir="${dist.dir}/etc" />
+	<copy file="etc/windows/lcp.bat" todir="${dist.dir}/etc" />
+	<copy file="etc/unix/java.cfg" todir="${dist.dir}/etc" />
+
+	<copy file="simple-test/jcs-tests" todir="${dist.dir}/simple-test" />
+	<copy file="simple-test/jcs-tests.bat" todir="${dist.dir}/simple-test" />
+
+
+	<antcall target="launcher">
+	   <param name="launcher-name" 	value="jcs"/>
+	   <param name="class-name"	value="org.globus.grid.ca.SimpleCA"/>
+	</antcall>
+
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Web App deployment                                                  -->
+  <!-- =================================================================== -->
+
+  <target name="webapp" depends="dist">
+   	<mkdir dir="${dist.dir}/webapps" />
+   	<mkdir dir="${dist.dir}/webapps/certservices" />
+   	<copy todir="${dist.dir}/webapps/certservices">
+    	<fileset dir="./WebContent"/>
+   	</copy>
+	<copy file="deploy-tomcat.xml" tofile="${dist.dir}/build.xml" />
+	<copy file="build.properties" todir="${dist.dir}" />
+  </target>
+
+
+  <target name="distbin" depends="distbinzip, distbingzip"/>
+
+  <target name="distbinzip" depends="dist">
+	<zip zipfile="${build.dir}/simpleca-${version}-bin.zip"
+	     basedir="${build.dir}"
+	     includes="jCertServices-${version}/**" />
+  </target>
+
+  <target name="distbingzip" depends="dist">
+     <tar destfile="${build.dir}/simpleca-${version}-bin.tar.gz" compression="gzip">
+      <tarfileset dir="${build.dir}" mode="755">
+       <include name="jCertServices-${version}/bin/*"/>
+       <exclude name="jCertServices-${version}/bin/*.bat"/>
+      </tarfileset>
+    <tarfileset dir="${build.dir}">
+       <include name="jCertServices-${version}/bin/*.bat"/>
+    </tarfileset>
+    <tarfileset dir="${build.dir}">
+      <include name="jCertServices-${version}/**"/>
+      <exclude name="jCertServices-${version}/bin/**"/>
+    </tarfileset>
+   </tar>
+  </target>
+
+
+  <target name="distdoc" depends="distdoczip, distdocgzip"/>
+
+  <target name="distdoczip" depends="javadoc">
+        <zip zipfile="${build.dir}/jCertServices-${version}-doc.zip"
+             basedir="${build.dir}"
+             includes="jCertServices-${version}/doc/**" />
+  </target>
+
+  <target name="distdocgzip" depends="javadoc">
+        <antcall target="targzip">
+           <param name="tar.file"    value="${build.dir}/jCertServices-${version}-doc.tar"/>
+           <param name="tar.basedir" value="${build.dir}"/>
+           <param name="tar.includes" value="jCertServices-${version}/doc/**"/>
+        </antcall>
+  </target>
+
+  <target name="targzip">
+     <tar tarfile="${tar.file}" basedir="${tar.basedir}" includes="${tar.includes}"/>
+     <gzip zipfile="${tar.file}.gz" src="${tar.file}" />
+     <delete file="${tar.file}" />
+  </target>
+
+</project>

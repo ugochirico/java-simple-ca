@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<project default="help" basedir=".">
+
+  <property file="build.properties"/>
+  <property name="project"        value="Java Certificate Services"/>
+
+  <!-- =================================================================== -->
+  <!-- Help                                                                -->
+  <!-- =================================================================== -->
+  
+  <target name="help">
+     <echo>
+The following targets can be executed:
+	deployTomcat - Deploys the web tool in Tomcat:
+		ant -Dtomcat.dir="C:\\Program Files\\Apache Group\\Tomcat 4.1" deployTomcat
+     </echo>
+  </target>
+
+
+
+  <!-- =================================================================== -->
+  <!-- Tomcat deployment                                                   -->
+  <!-- =================================================================== -->
+
+ <target name="redeployTomcat">
+   <delete dir="${tomcat.dir}/webapps/certservices" />
+   <antcall target="deployTomcat" />
+ </target>
+
+ <target name="deployTomcat"> 
+   <antcall target="deployTomcatLibs" />
+   <antcall target="deployWebappRoot">
+     <param name="webappsroot.dir" value="${tomcat.dir}/webapps/ROOT" />
+   </antcall>
+   <antcall target="deployWebapp">
+     <param name="webapps.dir" value="${tomcat.dir}/webapps" />
+   </antcall>
+ </target>
+
+ <target name="deployTomcatLibs">
+ <echo>Copying common JARS to ${tomcat.dir}/common/lib</echo>
+   <!--
+   <copy file="${lib.dir}/cog-jglobus.jar" toDir="${tomcat.dir}/common/lib" />
+   -->
+ </target>
+
+ <target name="deployWebappRoot">
+	 <!--
+	 <echo>deployWebappRoot</echo>
+	-->
+ </target>
+
+ <target name="deployWebapp">
+ <echo>Deploying webapp to ${webapps.dir}</echo>
+   <mkdir dir="${webapps.dir}/certservices" />
+   
+   
+   <copy todir="${webapps.dir}/certservices">
+    <fileset dir="./webapps/certservices"/>
+   </copy>
+	<!--
+   <copy toDir="${webapps.dir}/certservices/WEB-INF/lib">
+     <fileset dir="${lib.dir}" casesensitive="yes">
+       <include name="*.jar"/>
+     </fileset>
+   </copy> 
+	-->
+   <copy file="./etc/log4j.properties" toDir="${webapps.dir}/certservices/WEB-INF/classes" overwrite="true" />
+ </target>
+
+  <!-- 
+  This target generates the war files that should run in any servlet 
+	container 
+	-->
+<!--
+ <target name="war">
+   <delete file="certservices.war"/>
+   <jar jarfile="certservices.war">
+     <zipfileset dir="lib" prefix="WEB-INF/lib">
+        <include name="cog-jglobus.jar"/>
+        <include name="puretls.jar" />
+        <include name="cryptix32.jar"/>
+        <include name="cryptix-asn1.jar"/>
+        <include name="cryptix.jar"/>
+        <include name="jce-jdk13-117.jar"/>
+        <include name="jgss.jar"/>
+        <include name="cog-axis.jar"/>
+        <include name="log4j-core.jar"/>
+        <include name="junit.jar"/>
+     </zipfileset>
+     <zipfileset dir="webapps/certservices"/>
+     <zipfileset dir="${build.lib}" prefix="WEB-INF/lib">
+        <include name="${name}.jar"/>
+     </zipfileset>
+     <zipfileset dir="." includes="${log4j.file}" prefix="WEB-INF/classes" />
+   </jar>
+ </target>
+-->
+
+</project> 

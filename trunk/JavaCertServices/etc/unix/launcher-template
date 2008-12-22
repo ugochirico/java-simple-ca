@@ -1,0 +1,58 @@
+#! /bin/sh 
+
+EXEC=@class@
+OPTIONS=
+
+fixCommandLine() {
+
+    COMMANDLINE=
+
+    while [ "X$1" !=  "X" ] ; do
+        COMMANDLINE="${COMMANDLINE} \"$1\""
+        shift
+    done
+
+    echo $COMMANDLINE
+}
+
+updateOptions() {
+ 
+    if [ "X$2" != "X" ] ; then
+	OPTIONS="$OPTIONS -D$1=$2"
+    fi
+
+}
+
+####### MAIN BODY ##########
+
+if [ ! -d "$JCS_ROOT" ] ; then
+    echo "Error: JCS_ROOT not set" 1>&2
+    exit 1
+fi
+
+CONFIG=${JCS_ROOT}/etc/java.cfg
+
+if [ -r "${CONFIG}" ] ; then
+   . "${CONFIG}"
+else
+   echo "Error: Cannot find ${CONFIG} configuration file"
+   exit
+fi
+
+CMDLINE=`fixCommandLine "$@"`
+
+### SETUP OTHER ENV VARIABLES ####
+
+updateOptions "GLOBUS_LOCATION" "$GLOBUS_LOCATION"
+updateOptions "X509_USER_PROXY" "$X509_USER_PROXY"
+
+### EXECUTE ############
+
+LDAP_JARS=-Xbootclasspath/p:$JCS_ROOT/lib/providerutil.jar:$JCS_ROOT/lib/ldap.jar
+
+eval java ${OPTIONS} ${COG_OPTS} ${LDAP_JARS} -classpath ${LOCALCLASSPATH} ${EXEC} ${CMDLINE}
+return_code=$?
+
+exit $return_code
+
+
